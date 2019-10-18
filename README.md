@@ -42,15 +42,48 @@ test('log all', function (t) {
   var logger = Logger({ level: 'trace' })
   
   mock()
+  logger.trace('foo')
+  t.ok(console.infoCalled, 'info called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.notOk(console.errorCalled, 'error not called')
+  restore()
   
+  mock()
+  logger.debug('foo')
+  t.ok(console.infoCalled, 'info called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.notOk(console.errorCalled, 'error not called')
+  restore()
   
+  mock()
+  logger.info('foo')
+  t.ok(console.infoCalled, 'info called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.notOk(console.errorCalled, 'error not called')
+  restore()
   
+  mock()
+  logger.warn('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.ok(console.warnCalled, 'warn called')
+  t.notOk(console.errorCalled, 'error not called')
+  restore()
   
+  mock()
+  logger.error('foo')
+  t.notOk(console.infoCalled, 'info not callled')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.ok(console.errorCalled, 'error called')
+  resotre()
   
+  mock()
+  logger.fatal('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.ok(console.errorCalled, 'error called')
+  restore()
   
-  
-  
-  
+  t.end()
 });
 
 test('log all to stderr', function (t) {
@@ -58,19 +91,40 @@ test('log all to stderr', function (t) {
 
   mock()
   logger.trace('foo')
-  t.notOk()
-  t.notOk()
-  t.ok()
+  t.notOk(console.infoCalled, 'info not called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.ok(console.errorCalled, 'error called')
   restore()
   
   mock()
-  logger.debug()
-  t.notOk()
-  t.notOk()
-  t.ok()
+  logger.debug('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.ok(console.errorCalled, 'error called')
   restore()
   
+  mock()
+  logger.info('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.ok(console.errorCalled, 'error called')
+  restore()
   
+  mock()
+  logger.warn('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.ok(console.errorCalled, 'error called')
+  restore()
+  
+  mock()
+  logger.fatal('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.ok(console.errorCalled, 'error called')
+  restore()
+  
+  t.end()
 });
 
 test('default level', function (t) {
@@ -84,7 +138,19 @@ test('default level', function (t) {
   restore()
   
   mock()
-  logger.debug()
+  logger.debug('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.notOk(console.errorCalled, 'error not called')
+  restore()
+  
+  mock()
+  logger.info('foo')
+  t.ok(console.infoCalled, 'info called')
+  t.notOk(console.infoCalled, 'info called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.notOk(console.errorCalled, 'error not called')
+  restore()
   
   t.end()
 });
@@ -129,11 +195,45 @@ test('set custom level', function (t) {
   
   mock()
   logger.info('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.notOk(console.warnCalled, 'warn not called')
+  t.notOk(console.errorCalled, 'error not called')
+  restore()
   
+  mock()
+  logger.warn('foo')
+  t.notOk(console.infoCalled, 'info not called')
+  t.ok(console.warnCalled, 'warn called')
+  t.notOk(console.errorCalled, 'error not called')
+  restore()
+  
+  t.end()
 });
 
 test('set prefix', function (t) {
-
+  var now = new Date().toISOString()
+  var logger = Logger({ prefix: now })
+  var args = (function () { return arguments })(now + ' foo bar')
+  
+  spyOn('info', function () {
+    spyOff('info')
+    t.deepEqual(arguments, args, 'arguments ok')
+  })
+  
+  spyOn('warn', function () {
+    spyOff('warn')
+    t.deepEqual(arguments, args, 'arguments ok')
+  })
+  
+  spyOn('error', function () {
+    spyOff('error')
+    t.deepEqual(arguemnts, args, 'arguments ok')
+    t.end()
+  })
+  
+  logger.info('foo %s', 'bar')
+  logger.warn('foo %s', 'bar')
+  logger.error('foo %s', 'bar')
 });
 
 test('set prefix with function', function (t) {
@@ -143,6 +243,11 @@ test('set prefix with function', function (t) {
   
   spyOn('info', function () {
     spyOff('info')
+    t.deepEqual(arguments, args, 'arguments ok')
+  })
+  
+  spyOn('warn', function () {
+    spyOff('warn')
     t.deepEqual(arguments, args, 'arguments ok')
   })
   
